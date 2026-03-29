@@ -1,15 +1,15 @@
 package ru.netology.controller;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Reader;
+import ru.netology.model.Post;
+
+import java.util.List;
 
 public interface PostController {
-    void all(HttpServletResponse resp) throws IOException;
+    List<Post> all();
 
-    void getById(long id, HttpServletResponse resp);
+    Post getById(long id);
 
-    void save(Reader body, HttpServletResponse response) throws IOException;
+    Post save(Post post);
 
-    void removeById(long id, HttpServletResponse resp);
+    void removeById(long id);
 }
