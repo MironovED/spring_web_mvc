@@ -1,9 +1,9 @@
 package ru.netology.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @Repository
 public class PostRepositoryImpl implements PostRepository {
     private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
-    private static ConcurrentHashMap<Integer, Post> repository = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, Post> repository = new ConcurrentHashMap<>();
     private int count = 1;
 
     /**
@@ -25,7 +25,7 @@ public class PostRepositoryImpl implements PostRepository {
      * @return коллекцию объектов Post
      */
     public List<Post> all() {
-        return Collections.emptyList();
+        return repository.values().stream().filter(k -> !k.getRemoved()).toList();
     }
 
     /**
@@ -35,7 +35,11 @@ public class PostRepositoryImpl implements PostRepository {
      * @return Optional<Post>
      */
     public Optional<Post> getById(long id) {
-        return Optional.empty();
+        Optional<Post> result = repository.values().stream().filter(k -> k.getId() == id).findFirst();
+        if (result.isEmpty()) {
+            throw new NotFoundException("Объект с id = " + id + " не найден");
+        }
+        return result;
     }
 
     /**
@@ -46,17 +50,17 @@ public class PostRepositoryImpl implements PostRepository {
      */
     public Post save(Post post) {
         int id = (int) post.getId();
+        boolean flagRemoved = post.getRemoved();
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 threadPool.submit(() -> {
                             if (id == 0) {
                                 repository.put(count, post);
                                 count++;
-                            } else if (repository.get(id) != null) {
+                            } else if (repository.get(id) != null && !flagRemoved) {
                                 repository.replace(id, post);
                             } else {
-                                post.setId(id);
-                                post.setContent("Не существует Post запроса с данным идентификатором");
+                                throw new NotFoundException("Объект с id = " + id + " не найден");
                             }
                         }
                 ).get();
@@ -74,5 +78,11 @@ public class PostRepositoryImpl implements PostRepository {
      * @param id идентификатор записи
      */
     public void removeById(long id) {
+        if(repository.get(id) != null) {
+            repository.get(id).setRemoved(true);
+        }
+        else {
+            throw new NotFoundException("Объект с id = " + id + " не найден");
+        }
     }
 }
