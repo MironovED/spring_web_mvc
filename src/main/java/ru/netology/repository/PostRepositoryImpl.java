@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @Repository
 public class PostRepositoryImpl implements PostRepository {
     private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
-    private ConcurrentHashMap<Integer, Post> repository = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Integer, Post> repository = new ConcurrentHashMap<>();
     private int count = 1;
 
     /**
@@ -48,7 +48,7 @@ public class PostRepositoryImpl implements PostRepository {
         int id = (int) post.getId();
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                threadPool.execute(() -> {
+                threadPool.submit(() -> {
                             if (id == 0) {
                                 repository.put(count, post);
                                 count++;
@@ -59,10 +59,11 @@ public class PostRepositoryImpl implements PostRepository {
                                 post.setContent("Не существует Post запроса с данным идентификатором");
                             }
                         }
-                );
-            } finally {
-                threadPool.shutdownNow();
+                ).get();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            break;
         }
         return post;
     }
