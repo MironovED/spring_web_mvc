@@ -23,7 +23,7 @@ public class PostControllerImpl implements PostController {
 
   @GetMapping("/{id}")
   @ResponseStatus(code = HttpStatus.NOT_FOUND)
-  public Post getById(@PathVariable long id) {
+  public Post getById(@PathVariable("id") long id) {
     return service.getById(id);
   }
 
@@ -35,7 +35,7 @@ public class PostControllerImpl implements PostController {
 
   @DeleteMapping("/{id}")
   @ResponseStatus(code = HttpStatus.NOT_FOUND)
-  public void removeById(long id) {
+  public void removeById(@PathVariable("id") long id) {
     service.removeById(id);
   }
 }
