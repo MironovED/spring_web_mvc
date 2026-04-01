@@ -79,5 +79,10 @@ public class PostRepositoryImpl implements PostRepository {
      * @param id идентификатор записи
      */
     public void removeById(long id) {
+        if (repository.get(id) == null) {
+            throw new NotFoundException("Не существует Post с данным идентификатором");
+        } else {
+            repository.remove(id);
+        }
     }
 }
