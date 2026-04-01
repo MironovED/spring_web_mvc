@@ -1,9 +1,9 @@
 package ru.netology.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +25,7 @@ public class PostRepositoryImpl implements PostRepository {
      * @return коллекцию объектов Post
      */
     public List<Post> all() {
-        return Collections.emptyList();
+        return repository.values().stream().toList();
     }
 
     /**
@@ -35,7 +35,11 @@ public class PostRepositoryImpl implements PostRepository {
      * @return Optional<Post>
      */
     public Optional<Post> getById(long id) {
-        return Optional.empty();
+        Optional<Post> result = repository.values().stream().filter(k -> k.getId() == id).findFirst();
+        if (result.isEmpty()) {
+            throw new NotFoundException("Объект с id = " + id + " не найден");
+        }
+        return result;
     }
 
     /**
@@ -50,6 +54,7 @@ public class PostRepositoryImpl implements PostRepository {
             try {
                 threadPool.submit(() -> {
                             if (id == 0) {
+                                post.setId(count);
                                 repository.put(count, post);
                                 count++;
                             } else if (repository.get(id) != null) {

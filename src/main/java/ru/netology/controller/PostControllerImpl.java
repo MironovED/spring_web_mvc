@@ -21,7 +21,7 @@ public class PostControllerImpl implements PostController {
   }
 
   @GetMapping("/{id}")
-  public Post getById(@PathVariable long id) {
+  public Post getById(@PathVariable("id") long id) {
     return service.getById(id);
   }
 
