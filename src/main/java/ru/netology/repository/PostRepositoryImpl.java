@@ -3,7 +3,6 @@ package ru.netology.repository;
 import org.springframework.stereotype.Repository;
 import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,10 +78,8 @@ public class PostRepositoryImpl implements PostRepository {
      * @param id идентификатор записи
      */
     public void removeById(long id) {
-        if (repository.get(id) == null) {
-            throw new NotFoundException("Не существует Post с данным идентификатором");
-        } else {
-            repository.remove(id);
+        if(repository.containsKey((int)id)) {
+            repository.remove((int)id);
         }
-    }
+   }
 }
