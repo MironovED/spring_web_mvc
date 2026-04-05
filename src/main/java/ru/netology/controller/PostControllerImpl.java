@@ -1,5 +1,6 @@
 package ru.netology.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.netology.model.Post;
 import ru.netology.service.PostService;
@@ -21,6 +22,7 @@ public class PostControllerImpl implements PostController {
   }
 
   @GetMapping("/{id}")
+  @ResponseStatus(code = HttpStatus.NOT_FOUND)
   public Post getById(@PathVariable("id") long id) {
     return service.getById(id);
   }
@@ -31,6 +33,7 @@ public class PostControllerImpl implements PostController {
   }
 
   @DeleteMapping("/{id}")
+  @ResponseStatus(code = HttpStatus.NOT_FOUND)
   public void removeById(@PathVariable("id") long id) {
     service.removeById(id);
   }

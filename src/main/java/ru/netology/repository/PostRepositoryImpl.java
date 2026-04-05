@@ -80,6 +80,8 @@ public class PostRepositoryImpl implements PostRepository {
     public void removeById(long id) {
         if(repository.containsKey((int)id)) {
             repository.remove((int)id);
+        } else {
+            throw new NotFoundException("Объекта с id = " + id + " не существует");
         }
    }
 }
